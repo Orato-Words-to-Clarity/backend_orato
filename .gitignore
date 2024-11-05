@@ -58,6 +58,6 @@ coverage.xml
 
 # Docker
 *.docker
-docker-compose.yaml
-Dockerfile
-docker-compose.*
+!docker-compose.yaml
+!Dockerfile
+!docker-compose.*

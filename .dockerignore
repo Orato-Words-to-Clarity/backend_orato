@@ -1,0 +1,14 @@
+# Ignore Python cache files
+__pycache__
+*.pyc
+*.pyo
+
+# Ignore virtual environment directories
+venv/
+env/
+.env
+
+# Ignore any local files you don't want to include in the Docker image
+*.log
+*.sqlite3
+*.db
