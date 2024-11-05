@@ -2,7 +2,7 @@ import os
 from groq import Groq
 
 # Initialize the Groq client
-api_key = "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"  # Replace with your actual API key
+api_key =  os.getenv("GROQ_API_KEY")
 client = Groq(api_key=api_key)
 
 def transcribe_audio(file_path: str) -> str:
