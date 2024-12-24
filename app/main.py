@@ -8,7 +8,6 @@ app = FastAPI()
 
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(api_router, prefix="/api/v1")
-app.include_router(auth.router, prefix="/api/v1")
 
 @app.get('/')
 def read_root():
