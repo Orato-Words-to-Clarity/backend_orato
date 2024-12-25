@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel
 
 class UserCreate(BaseModel):
@@ -6,11 +5,11 @@ class UserCreate(BaseModel):
     email: str
     password: str
 
-class User(BaseModel):
+class UserResponse(BaseModel):
     id: int
     username: str
     email: str
 
     class Config:
-        from_attribtues = True
-        
+        from_attributes = True
+        arbitrary_types_allowed = True

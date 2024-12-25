@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.api.v1.schemas.user import UserCreate, User
+from app.api.v1.schemas.user import UserCreate, UserResponse
 from app.api.v1.schemas.token import Token, TokenData
 from app.core.database import get_db
 from app.db.repositories.user import create_user, get_user_by_username, get_user_by_email
@@ -23,16 +23,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 router = APIRouter()
 
-@router.post("/register",response_model=ResponseModel[User])
+@router.post("/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user_by_username = get_user_by_username(db, username=user.username)
     db_user_by_email = get_user_by_email(db, email=user.email)
     if db_user_by_username:
-        return ResponseHandler.error("Username already registered", status_code=400)
+        raise HTTPException(status_code=400, detail="Username already registered")
     if db_user_by_email:
-        return ResponseHandler.error("Email already registered", status_code=400)
+        raise HTTPException(status_code=400, detail="Email already registered")
     created_user = create_user(db=db, user=user)
-    return ResponseHandler.success(data=created_user, message="User registered successfully", status_code=201)
+    return created_user
 
 @router.post("/login", response_model=ResponseModel[Token])
 def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
