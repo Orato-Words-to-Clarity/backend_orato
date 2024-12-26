@@ -9,9 +9,8 @@ from app.api.v1.schemas.user import UserCreate, UserResponse
 from app.api.v1.schemas.token import Token, TokenData
 from app.core.database import get_db
 from app.db.repositories.user import create_user, get_user_by_username, get_user_by_email
-from app.utils.auth import authenticate_user, create_access_token, create_refresh_token, get_current_user
+from app.utils.auth import authenticate_user, create_access_token, create_refresh_token, get_current_user,validate_email
 from app.utils.response_utils import ResponseHandler, ResponseModel
-
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
@@ -25,6 +24,10 @@ router = APIRouter()
 
 @router.post("/register", response_model=ResponseModel[UserResponse])
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
+
+    if(not validate_email(user.email)):
+        return ResponseHandler.error("Invalid email address", status_code=400)
+    
     db_user_by_username = get_user_by_username(db, username=user.username)
     db_user_by_email = get_user_by_email(db, email=user.email)
     if db_user_by_username:
@@ -32,7 +35,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     if db_user_by_email:
         return ResponseHandler.error("Email already registered", status_code=400)
     created_user = create_user(db=db, user=user)
-    return ResponseHandler.success(data=created_user, message="User registered successfully")
+    user_response = UserResponse.model_validate(created_user)
+    return ResponseHandler.success(data=user_response, message="User registered successfully")
 
 @router.post("/login", response_model=ResponseModel[Token])
 def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
