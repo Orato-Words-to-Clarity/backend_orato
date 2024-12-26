@@ -23,16 +23,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 router = APIRouter()
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/register", response_model=ResponseModel[UserResponse])
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user_by_username = get_user_by_username(db, username=user.username)
     db_user_by_email = get_user_by_email(db, email=user.email)
     if db_user_by_username:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        return ResponseHandler.error("Username already registered", status_code=400)
     if db_user_by_email:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        return ResponseHandler.error("Email already registered", status_code=400)
     created_user = create_user(db=db, user=user)
-    return created_user
+    return ResponseHandler.success(data=created_user, message="User registered successfully")
 
 @router.post("/login", response_model=ResponseModel[Token])
 def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
