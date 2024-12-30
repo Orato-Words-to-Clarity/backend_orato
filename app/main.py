@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from app.api.v1.routes import users, router as api_router,auth
 from fastapi.middleware.cors import CORSMiddleware
+from app.utils.auth_middleware import create_auth_middleware
+
 # Load environment variables
 load_dotenv()
 
@@ -15,6 +17,9 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
+
+# Add authentication middleware
+create_auth_middleware(app)
 
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(api_router, prefix="/api/v1")
