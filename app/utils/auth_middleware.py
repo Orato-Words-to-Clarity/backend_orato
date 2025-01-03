@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.db.models.user import User
-from app.db.repositories.user import get_user_by_username
+from app.db.repositories.user import get_user_by_email
 
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
@@ -18,15 +18,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = get_user_by_username(db, username=username)
-    if user is None:
+    email = get_user_by_email(db, email=email)
+    if email is None:
         raise credentials_exception
-    return user
+    return email
 
 def create_auth_middleware(app: FastAPI):
     @app.middleware("http")
@@ -41,10 +41,10 @@ def create_auth_middleware(app: FastAPI):
             try:
                 token = token.split(" ")[1]
                 payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-                username: str = payload.get("sub")
-                if username is None:
+                email: str = payload.get("sub")
+                if email is None:
                     raise HTTPException(status_code=401, detail="Invalid token")
-                request.state.user = username
+                request.state.email = email
             except JWTError:
                 raise HTTPException(status_code=401, detail="Invalid token")
         response = await call_next(request)

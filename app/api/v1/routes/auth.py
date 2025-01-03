@@ -4,6 +4,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security.oauth2 import OAuth2EmailPasswordRequestForm
 from sqlalchemy.orm import Session
 from app.api.v1.schemas.user import UserCreate, UserResponse
 from app.api.v1.schemas.token import Token, TokenData
@@ -39,8 +40,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return ResponseHandler.success(data=user_response, message="User registered successfully")
 
 @router.post("/login", response_model=ResponseModel[Token])
-def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_user(db, form_data.username, form_data.password)
+def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2EmailPasswordRequestForm = Depends()):
+    user = authenticate_user(db, form_data.email, form_data.password)
     if not user:
         return ResponseHandler.error(
             "Incorrect username or password",
@@ -50,10 +51,10 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     refresh_token_expires = timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
     refresh_token = create_refresh_token(
-        data={"sub": user.username}, expires_delta=refresh_token_expires
+        data={"sub": user.email}, expires_delta=refresh_token_expires
     )
     return ResponseHandler.success(
         data={
@@ -73,19 +74,19 @@ def refresh_access_token(refresh_token: str, db: Session = Depends(get_db)):
     )
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             return ResponseHandler.error("Invalid refresh token", status_code=401)
     except JWTError:
         return ResponseHandler.error("Invalid refresh token", status_code=401)
 
-    user = get_user_by_username(db, username=username)
+    user = get_user_by_email(db, email=email)
     if user is None:
         return ResponseHandler.error("User not found", status_code=401)
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
     return ResponseHandler.success(
         data={
