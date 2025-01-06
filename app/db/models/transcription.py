@@ -10,6 +10,7 @@ class Transcription(Base):
     audio_id = Column(Integer, ForeignKey("audio.audio_id"), nullable=False)
     text = Column(String, nullable=False)
     embedding_id = Column(Integer, nullable=True)
+    language = Column(String, nullable=True)  # Add the language field
     created_at = Column(DateTime, default=datetime.utcnow)
 
     audio = relationship("Audio", back_populates="transcriptions")
