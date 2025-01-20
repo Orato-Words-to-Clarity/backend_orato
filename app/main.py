@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from app.api.v1.routes import users, router as api_router,auth
 from fastapi.middleware.cors import CORSMiddleware
-from app.utils.auth_middleware import create_auth_middleware
 
 # Load environment variables
 load_dotenv()
@@ -19,6 +18,7 @@ app.add_middleware(
 )
 
 # Add authentication middleware
+# AUTH MIDDLEWARE HAS BEEN CHANGE TO THE Depends(get_user) method as discussed before. Function Below is redundant.
 # create_auth_middleware(app)
 
 app.include_router(users.router, prefix="/api/v1")
