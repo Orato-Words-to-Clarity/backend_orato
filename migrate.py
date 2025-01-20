@@ -46,6 +46,7 @@ def run_migrations():
     applied_migrations = get_applied_migrations(cursor)
 
     # Apply SQL migrations, excluding 'latest.sql'
+    # Apply SQL migrations from the main SQL folder, excluding 'latest.sql'
     sql_files = sorted(Path(SQL_FOLDER).glob("*.sql"))
     for file in sql_files:
         if file.name == "latest.sql":  # Skip 'latest.sql'
@@ -53,9 +54,22 @@ def run_migrations():
         if file.name not in applied_migrations:
             apply_sql_migration(cursor, file.name, file)
 
+    # Apply SQL migrations from the 'alter' subdirectory
+    alter_sql_files = sorted(Path(SQL_FOLDER, "alter").glob("*.sql"))
+    for file in alter_sql_files:
+        if file.name not in applied_migrations:
+            apply_sql_migration(cursor, file.name, file)
+
     # Apply Python migrations
     python_files = sorted(Path(PYTHON_FOLDER).glob("*.py"))
     for file in python_files:
+        if file.name not in applied_migrations:
+            module_name = f"migrations.pys.{file.stem}"
+            apply_python_migration(cursor, file.name, module_name)
+
+    # Apply Python migrations from the 'alter' subdirectory
+    alter_python_files = sorted(Path(PYTHON_FOLDER, "alter").glob("*.sql"))
+    for file in alter_python_files:
         if file.name not in applied_migrations:
             module_name = f"migrations.pys.{file.stem}"
             apply_python_migration(cursor, file.name, module_name)
