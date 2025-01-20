@@ -1,11 +1,8 @@
-import os
-from typing import Any
 from fastapi import APIRouter,Depends
 from app.api.v1.schemas.transcription import Transcription, TranscriptionRequest
 from app.db.models.audio import Audio
 from app.db.repositories.transcription import update_transcription
 from app.services.transcription_service import transcribe_audio
-import tempfile
 from app.utils.response_utils import ResponseHandler, ResponseModel
 from app.utils.auth import get_current_user
 from app.db.models.user import User
@@ -15,8 +12,6 @@ from app.core.database import get_db
 
 
 router = APIRouter()
-
-from typing import Dict
 
 
 

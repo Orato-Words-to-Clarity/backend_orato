@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
 from app.db.models.audio import Audio
-from app.db.models.transcription import Transcription
 from app.db.models.user import User
 
 def get_all_audios(db: Session,user: User): 

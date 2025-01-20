@@ -3,7 +3,6 @@ import os
 import requests
 from groq import Groq
 from dotenv import load_dotenv
-from azure.storage.blob import download_blob_from_url
 
 load_dotenv()
 

@@ -1,17 +1,16 @@
 import os
-from datetime import datetime, timedelta
+from datetime import timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import APIRouter, Body, Depends, Form, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, Form, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.api.v1.schemas.user import UserCreate, UserResponse
-from app.api.v1.schemas.token import Token, TokenData
+from app.api.v1.schemas.token import Token
 from app.core.database import get_db
 from app.db.repositories.user import create_user, get_user_by_username, get_user_by_email
-from app.utils.auth import authenticate_user, create_access_token, create_refresh_token, get_current_user,validate_email
+from app.utils.auth import authenticate_user, create_access_token, create_refresh_token,validate_email
 from app.utils.response_utils import ResponseHandler, ResponseModel
 
 SECRET_KEY = os.getenv("SECRET_KEY")
