@@ -2,9 +2,10 @@ import os
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import APIRouter, Depends, Form, HTTPException, status
+from fastapi import APIRouter, Body, Depends, Form, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.api.v1.schemas.user import UserCreate, UserResponse
 from app.api.v1.schemas.token import Token, TokenData
@@ -64,16 +65,20 @@ def login_for_access_token(email: str = Form(...), password: str = Form(...),db:
         },
         message="Login successful"
     )
+    
+
+class RefreshTokenRequestBody(BaseModel):
+    refresh_token: str
 
 @router.post("/refresh", response_model=ResponseModel[Token])
-def refresh_access_token(refresh_token: str, db: Session = Depends(get_db)):
+def refresh_access_token(body: RefreshTokenRequestBody, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(body.refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             return ResponseHandler.error("Invalid refresh token", status_code=401)
@@ -91,7 +96,7 @@ def refresh_access_token(refresh_token: str, db: Session = Depends(get_db)):
     return ResponseHandler.success(
         data={
             "access_token": access_token,
-            "refresh_token": refresh_token,
+            "refresh_token": body.refresh_token,
             "token_type": "bearer"
         },
         message="Token refreshed successfully"
