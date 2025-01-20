@@ -22,13 +22,12 @@ from typing import Dict
 
 
 @router.post("/transcribe", response_model=ResponseModel[Transcription])
-async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_db),):
+async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     # Get the audio file url from the db using audio id
     audio: Audio | None = db.query(Audio).filter(Audio.audio_id == request.audio_id).first()
     if not audio:
         ResponseHandler.error(message="Audio not found", status_code=400)
     
-    print('asd')
     transcription_result = transcribe_audio(audio.file_path)
     
 
