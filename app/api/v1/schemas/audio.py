@@ -18,7 +18,6 @@ class TranscriptionResponse(BaseModel):
 
 class AudioResponse(BaseModel):
     audio_id: int
-    user_id: int
     file_path: str
     file_name: str
     language: str
@@ -28,4 +27,11 @@ class AudioResponse(BaseModel):
         from_attributes = True
 
 class AudioWithTranscriptionResponse(AudioResponse):
-    transcriptions: List[TranscriptionResponse]
+    transcription: TranscriptionResponse
+
+class UploadAudioResponse(BaseModel):
+    audio_id: str
+    file_path: str
+    file_name: str
+    
+    
