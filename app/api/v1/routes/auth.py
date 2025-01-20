@@ -2,9 +2,9 @@ import os
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.security.oauth2 import OAuth2EmailPasswordRequestForm
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.api.v1.schemas.user import UserCreate, UserResponse
 from app.api.v1.schemas.token import Token, TokenData
@@ -40,8 +40,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return ResponseHandler.success(data=user_response, message="User registered successfully")
 
 @router.post("/login", response_model=ResponseModel[Token])
-def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2EmailPasswordRequestForm = Depends()):
-    user = authenticate_user(db, form_data.email, form_data.password)
+def login_for_access_token(email: str = Form(...), password: str = Form(...),db: Session = Depends(get_db)):
+    user = authenticate_user(db, email, password)
     if not user:
         return ResponseHandler.error(
             "Incorrect username or password",

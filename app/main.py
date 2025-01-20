@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 # Add authentication middleware
-create_auth_middleware(app)
+# create_auth_middleware(app)
 
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(api_router, prefix="/api/v1")
