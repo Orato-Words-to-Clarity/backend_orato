@@ -23,8 +23,9 @@ def get_audios(db: Session = Depends(get_db), current_user: User = Depends(get_c
     # Retrieve all audios for the authenticated user
     audios = get_all_audios(db, current_user)
     if not audios:
-        return ResponseHandler.error("No audios found for the user", status_code=404)
-    return ResponseHandler(audios, message="Audios retrieved successfully")
+        return ResponseHandler.success([],"No audios found for the user", status_code=200)
+    audio_data = [AudioResponse.model_validate(audio) for audio in audios]
+    return ResponseHandler.success(audio_data, message="Audios retrieved successfully")
 
 
 
@@ -35,7 +36,7 @@ def get_audio_with_transcription(audio_id: int, db: Session = Depends(get_db), c
         return ResponseHandler.error("Audio not found", status_code=404)
     if(audio.user_id != current_user.id):
         return ResponseHandler.error("You don't have permission to access this audio", status_code=403)
-    return ResponseHandler(audio, message="Audio retrieved successfully")
+    return ResponseHandler.success(AudioWithTranscriptionResponse.model_validate(audio), message="Audio retrieved successfully")
 
 
 
