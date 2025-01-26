@@ -29,10 +29,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     if(not validate_email(user.email)):
         return ResponseHandler.error("Invalid email address", status_code=400)
     
-    db_user_by_username = get_user_by_username(db, username=user.username)
     db_user_by_email = get_user_by_email(db, email=user.email)
-    if db_user_by_username:
-        return ResponseHandler.error("Username already registered", status_code=400)
     if db_user_by_email:
         return ResponseHandler.error("Email already registered", status_code=400)
     created_user = create_user(db=db, user=user)
