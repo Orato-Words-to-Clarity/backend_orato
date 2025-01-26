@@ -16,4 +16,4 @@ class Audio(Base):
     created_at = Column(DateTime, default=datetime.now)
 
     user = relationship("User")
-    transcription = relationship("Transcription", back_populates="audio")
+    transcription = relationship("Transcription", uselist=False, back_populates="audio")

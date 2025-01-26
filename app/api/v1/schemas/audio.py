@@ -7,14 +7,12 @@ from typing import List, Optional
 
 class TranscriptionResponse(BaseModel):
     transcription_id: str
-    audio_id: str
-    text: str
-    embedding_id: Optional[int]
-    language: Optional[str]
-    created_at: datetime
+    text:str
+    created_at: str 
 
     class Config:
         from_attributes = True
+        
         
     @field_validator("created_at", mode="before")
     def convert_datetime_to_str(cls, value):
@@ -28,11 +26,6 @@ class TranscriptionResponse(BaseModel):
             return str(value)
         return value
     
-    @field_validator("audio_id", mode="before")
-    def convert_uuid_to_str(cls, value):
-        if isinstance(value, UUID):
-            return str(value)
-        return value
 
 
 
@@ -59,7 +52,8 @@ class AudioResponse(BaseModel):
         return value
 
 class AudioWithTranscriptionResponse(AudioResponse):
-    transcription: TranscriptionResponse
+    transcription: TranscriptionResponse | None
+        
 
 class UploadAudioResponse(BaseModel):
     audio_id: str

@@ -30,12 +30,13 @@ def get_audios(db: Session = Depends(get_db), current_user: User = Depends(get_c
 
 
 @router.get("/{audio_id}", response_model=ResponseModel[AudioWithTranscriptionResponse])
-def get_audio_with_transcription(audio_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_audio_with_transcription(audio_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     audio = get_audio_details(db, audio_id)
     if not audio:
         return ResponseHandler.error("Audio not found", status_code=404)
     if(audio.user_id != current_user.id):
         return ResponseHandler.error("You don't have permission to access this audio", status_code=403)
+    print(audio.transcription)
     return ResponseHandler.success(AudioWithTranscriptionResponse.model_validate(audio), message="Audio retrieved successfully")
 
 
