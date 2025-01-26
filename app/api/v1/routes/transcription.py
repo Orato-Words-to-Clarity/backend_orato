@@ -24,7 +24,6 @@ async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_d
         ResponseHandler.error(message="Audio not found", status_code=400)
     
     transcription_result = transcribe_audio(audio.file_path)
-    
 
     # Return the transcription result
     if "An error occurred" in transcription_result:
@@ -34,7 +33,7 @@ async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_d
             status_code=500
         )
         
-    update_transcription(db,audio.audio_id, transcription_result)
+    update_transcription(db,audio.audio_id, transcription_result["text"], transcription_result["language"])
 
 
     return ResponseHandler.success(

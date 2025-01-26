@@ -6,7 +6,8 @@ from app.db.models.transcription import Transcription
 from app.utils.response_utils import ResponseHandler
 
 
-def update_transcription(db: Session, audio_id:Column[UUID] , transcription:str):
+def update_transcription(db: Session, audio_id:Column[UUID] , transcription:str,language:str):
+        
     audio = db.query(Audio).filter(Audio.audio_id == audio_id).first()
     if not audio:
         return ResponseHandler.error("Audio not found",status_code=400)
@@ -14,10 +15,13 @@ def update_transcription(db: Session, audio_id:Column[UUID] , transcription:str)
     transcription_obj = db.query(Transcription).filter(Transcription.audio_id == audio_id).first()
     if  transcription_obj:
         transcription_obj.text = transcription
+        transcription_obj.language = language
         db.commit()
     else:
         transcription_obj = Transcription(audio_id=audio_id,text=transcription)
         db.add(transcription_obj)
         db.commit()
+    #display the transcription object details
+    print("transcriptions object :" ,transcription_obj.language)
     
    
