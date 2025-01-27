@@ -13,6 +13,7 @@ def run_migrations():
     except subprocess.CalledProcessError as e:
         print(f"Error applying migrations: {e}")
         exit(1)
+    
 
 if __name__ == "__main__":
     import uvicorn
