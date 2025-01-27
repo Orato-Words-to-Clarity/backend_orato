@@ -1,0 +1,30 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - production  # Trigger deployment when code is pushed to the production branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Run the job on an Ubuntu server
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2  # Checkout your code from the repository
+
+    - name: Set up SSH key for server
+      uses: webfactory/ssh-agent@v0.5.3  # Use this action to set up SSH agent with your SSH private key
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Use the SSH key from GitHub secrets
+
+    - name: Deploy the application
+      run: |
+        # SSH into your server and pull the latest code from the production branch
+        ssh -o StrictHostKeyChecking=no ubuntu@4.186.24.76 << 'EOF'
+        cd /home/ubuntu/projects/backend_orato
+        git checkout production  # Make sure you're on the production branch
+        git pull origin production  # Pull the latest code from GitHub
+        docker-compose down  # Stop any running containers
+        docker-compose up -d  # Restart your application with the new code
+        EOF
