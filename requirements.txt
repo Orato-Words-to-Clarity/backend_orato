@@ -34,7 +34,6 @@ orjson==3.10.12
 packaging==24.2
 passlib==1.7.4
 pluggy==1.5.0
-psycopg2==2.9.10
 psycopg2-binary==2.9.10
 pyasn1==0.6.1
 pycparser==2.22
