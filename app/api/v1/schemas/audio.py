@@ -8,6 +8,7 @@ from typing import List, Optional
 class TranscriptionResponse(BaseModel):
     transcription_id: str
     text:str
+    language: str
     created_at: str 
 
     class Config:

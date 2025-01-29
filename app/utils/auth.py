@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta, timezone
+from dotenv import load_dotenv
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
@@ -8,6 +9,8 @@ from sqlalchemy.orm import Session
 from app.db.repositories.user import get_user_by_email, get_user_by_username
 from app.core.database import get_db
 import re 
+
+load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
