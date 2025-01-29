@@ -33,8 +33,7 @@ async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_d
             status_code=500
         )
         
-    update_transcription(db,audio.audio_id, transcription_result["text"], transcription_result["language"])
-
+    transcription_result["transcription_id"] = update_transcription(db,audio.audio_id, transcription_result["text"], transcription_result["language"])
 
     return ResponseHandler.success(
         data={"transcription": transcription_result},

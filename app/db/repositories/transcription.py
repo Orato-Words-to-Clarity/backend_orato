@@ -1,8 +1,9 @@
 from sqlalchemy import  Column
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.db.models.audio import Audio
 from app.db.models.transcription import Transcription
+from app.db.models.user import User
 from app.utils.response_utils import ResponseHandler
 
 
@@ -22,6 +23,17 @@ def update_transcription(db: Session, audio_id:Column[UUID] , transcription:str,
         db.add(transcription_obj)
         db.commit()
     #display the transcription object details
-    print("transcriptions object :" ,transcription_obj.language)
+    # print("transcriptions object :" ,transcription_obj.language)
+    return str(transcription_obj.transcription_id)
     
    
+def get_transcription_using_id(db: Session, transcription_id: str, user: User):
+    transcription = db.query(Transcription).options(joinedload(Transcription.audio)).filter(Transcription.transcription_id == transcription_id).first()
+
+    if not transcription:
+        return ResponseHandler.error("Transcription not found", status_code=400)
+    
+    if transcription.audio.user_id != user.id :
+        return ResponseHandler.error("You don't have permission to access this transcription", status_code=403)
+    
+    return transcription

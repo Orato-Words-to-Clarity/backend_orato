@@ -50,7 +50,13 @@ LANGUAGE_CODES_TO_NAMES = {
     'vi': 'Vietnamese',
 }
 
-def transcribe_audio(file_path: str) -> str:
+
+class TranscriptionServiceResponse:
+    text: str
+    language: str
+    transcription_id: str = None
+
+def transcribe_audio(file_path: str) -> TranscriptionServiceResponse:
     """
     Transcribe audio using the Groq Whisper API.
     :param file_path: Path to the audio file which is a url to the file stored in Azure Blob Storage.
