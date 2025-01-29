@@ -18,7 +18,7 @@ def update_transcription(db: Session, audio_id:Column[UUID] , transcription:str,
         transcription_obj.language = language
         db.commit()
     else:
-        transcription_obj = Transcription(audio_id=audio_id,text=transcription)
+        transcription_obj = Transcription(audio_id=audio_id,text=transcription,language=language)
         db.add(transcription_obj)
         db.commit()
     #display the transcription object details
