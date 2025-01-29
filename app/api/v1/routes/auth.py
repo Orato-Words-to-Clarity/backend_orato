@@ -23,7 +23,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 router = APIRouter()
 
-@router.post("/register", response_model=ResponseModel[UserResponse])
+@router.post("/register/", response_model=ResponseModel[UserResponse])
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
     if(not validate_email(user.email)):
@@ -36,7 +36,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     user_response = UserResponse.model_validate(created_user)
     return ResponseHandler.success(data=user_response, message="User registered successfully")
 
-@router.post("/login", response_model=ResponseModel[Token])
+@router.post("/login/", response_model=ResponseModel[Token])
 def login_for_access_token(email: str = Form(...), password: str = Form(...),db: Session = Depends(get_db)):
     user = authenticate_user(db, email, password)
     if not user:
@@ -66,7 +66,7 @@ def login_for_access_token(email: str = Form(...), password: str = Form(...),db:
 class RefreshTokenRequestBody(BaseModel):
     refresh_token: str
 
-@router.post("/refresh", response_model=ResponseModel[Token])
+@router.post("/refresh/", response_model=ResponseModel[Token])
 def refresh_access_token(body: RefreshTokenRequestBody, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

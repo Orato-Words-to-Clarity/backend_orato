@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from app.core.database import Base
 
 class Transcription(Base):
@@ -13,6 +13,6 @@ class Transcription(Base):
     text = Column(String, nullable=False)
     embedding_id = Column(Integer, nullable=True)
     language = Column(String, nullable=True)  # Add the language field
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=5, minutes=30))))
 
     audio = relationship("Audio", back_populates="transcription")

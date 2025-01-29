@@ -29,7 +29,7 @@ def get_audios(db: Session = Depends(get_db), current_user: User = Depends(get_c
 
 
 
-@router.get("/{audio_id}", response_model=ResponseModel[AudioWithTranscriptionResponse])
+@router.get("/{audio_id}/", response_model=ResponseModel[AudioWithTranscriptionResponse])
 def get_audio_with_transcription(audio_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     audio = get_audio_details(db, audio_id)
     if not audio:
@@ -41,7 +41,7 @@ def get_audio_with_transcription(audio_id: str, db: Session = Depends(get_db), c
 
 
 
-@router.post("/upload-audio", response_model=ResponseModel[UploadAudioResponse])
+@router.post("/upload-audio/", response_model=ResponseModel[UploadAudioResponse])
 async def upload_audio(file: UploadFile = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # TODO: Implement audio upload logic
     # Check the content type to make sure it's an audio file

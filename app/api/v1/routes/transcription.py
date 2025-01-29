@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 
-@router.post("/transcribe", response_model=ResponseModel[Transcription])
+@router.post("/transcribe/", response_model=ResponseModel[Transcription])
 async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     # Get the audio file url from the db using audio id
     audio: Audio | None = db.query(Audio).filter(Audio.audio_id == request.audio_id).first()
