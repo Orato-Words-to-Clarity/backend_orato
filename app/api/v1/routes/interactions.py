@@ -38,7 +38,8 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
                 [STRICT OUTPUT FORMAT]:  
                 - The response **must be valid HTML** with no additional text, comments, or explanations.  
                 - **DO NOT** include any non-HTML content or extra remarks.  
-                - **DO NOT** mix formats—strictly follow the correct structure as defined below.  
+                - **DO NOT** mix formats—strictly follow the correct structure as defined below.
+                - **MUST** use tailwind styles for styling purposes  
 
                 [STRICT RULES]:  
                 - **Meeting Minutes (ONLY if requested):**  
@@ -64,7 +65,8 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
                 [IMPORTANT]:  
                 - **FOLLOW THE RULES STRICTLY. DO NOT DEVIATE.**  
                 - **NO INTRODUCTIONS, NO CONCLUSIONS, NO EXTRA TEXT—ONLY RETURN THE HTML.**  
-                - **DO NOT return markdown, plain text, or any explanations—only well-formatted HTML.**  
+                - **DO NOT return markdown, plain text, or any explanations—only well-formatted HTML.**
+                - **MUST ONLY use tailwind for styling**   
 """
 
             
@@ -74,3 +76,12 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
     
     return ResponseHandler.success(message="Content Generated Successfully", data=generated_content)
     
+    
+
+
+
+# @router.post("/ask",response_model=ResponseModel)
+
+# def ask_question(request: TranscriptionRequest, db: Session= Depends(get_db), user: User= Depends(get_current_user)):
+  
+  
