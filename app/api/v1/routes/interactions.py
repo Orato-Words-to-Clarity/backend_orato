@@ -26,27 +26,48 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
     transcription = get_transcription_using_id(db,request.transcription_id,user)
     
     # Send a prompt to Llama to get generated response
-    structured_prompt = f"""
-                You are an AI assistant tasked with generating structured and professional {request.request_type} format.
-                {prompt_mapping[request.request_type]}  
-                
-                Below is the input content:
+    structured_prompt =  f"""
+                Generate a structured and professional {request.request_type} in **HTML format only**.
 
-                [CONTENT]:  
+                [PROMPT]:  
+                {prompt_mapping[request.request_type]}  
+
+                [TRANSCRIPTION]:  
                 {transcription.text}  
 
-                Follow these instructions:  
-                1. Ensure clarity and conciseness.  
-                2. Maintain a formal and professional tone.  
-                3. Structure the response appropriately:
-                - **For meeting minutes:** Include date, time, attendees, agenda, key discussions, decisions made, and action items.  
-                - **For class notes:** Use bullet points or headings for different topics, summarize key concepts, and highlight important points.  
-                - **For summaries:** Extract main ideas, key takeaways, and supporting details in a structured manner.  
-                - **For custom format:** Adhere to the user-specified style and structure.  
-                4. I want the generated content to be convertible into pdf, text or doc format. 
+                [STRICT OUTPUT FORMAT]:  
+                - The response **must be valid HTML** with no additional text, comments, or explanations.  
+                - **DO NOT** include any non-HTML content or extra remarks.  
+                - **DO NOT** mix formats—strictly follow the correct structure as defined below.
+                - **MUST** use tailwind styles for styling purposes  
 
-                Generate a well-formatted output based on these guidelines.
-        """
+                [STRICT RULES]:  
+                - **Meeting Minutes (ONLY if requested):**  
+                  - **MUST contain:** Date, time, attendees, agenda, key discussions, decisions made, and action items.  
+                  - **Use headings and lists** for structured representation.  
+                  - **DO NOT use paragraphs; use structured HTML elements.**  
+
+                - **Class Notes (ONLY if requested):**  
+                  - **MUST contain:** Headings, bullet points, and structured sections.  
+                  - **DO NOT use paragraph-based summaries; ensure clarity with structured elements.**  
+
+                - **Summaries (ONLY if requested):**  
+                  - **MUST contain:** Extracted main ideas and key takeaways.  
+                  - **MUST be in paragraph format ONLY—NO bullet points or lists.**  
+                  - **DO NOT include agenda, attendees, or action items (these belong to meeting minutes).**  
+
+                - **Custom Format (STRICTLY FOLLOW USER INPUT):**  
+                  - **DO NOT assume any structure. Follow the exact instructions provided by the user.**  
+                  - **DO NOT default to meeting minutes.**  
+                  - **If the user does not specify a format, return only the transcription as HTML text.**  
+                  - **Ignore all other formats unless explicitly stated.**  
+
+                [IMPORTANT]:  
+                - **FOLLOW THE RULES STRICTLY. DO NOT DEVIATE.**  
+                - **NO INTRODUCTIONS, NO CONCLUSIONS, NO EXTRA TEXT—ONLY RETURN THE HTML.**  
+                - **DO NOT return markdown, plain text, or any explanations—only well-formatted HTML.**
+                - **MUST ONLY use tailwind for styling**   
+"""
 
             
             
@@ -55,3 +76,12 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
     
     return ResponseHandler.success(message="Content Generated Successfully", data=generated_content)
     
+    
+
+
+
+# @router.post("/ask",response_model=ResponseModel)
+
+# def ask_question(request: TranscriptionRequest, db: Session= Depends(get_db), user: User= Depends(get_current_user)):
+  
+  
