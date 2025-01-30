@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.db.models.user import User
-from app.db.repositories.audio import create_audio, get_all_audios, get_audio_details
+from app.db.repositories.audio import create_audio, delete_audio, get_all_audios, get_audio_details
 from app.api.v1.schemas.audio import AudioResponse, AudioWithTranscriptionResponse, UploadAudioResponse
 
 from typing import List
@@ -38,6 +38,26 @@ def get_audio_with_transcription(audio_id: str, db: Session = Depends(get_db), c
         return ResponseHandler.error("You don't have permission to access this audio", status_code=403)
     print(audio.transcription)
     return ResponseHandler.success(AudioWithTranscriptionResponse.model_validate(audio), message="Audio retrieved successfully")
+
+@router.delete("/{audio_id}/delete", response_model=ResponseModel[AudioResponse])
+def delete_audio_with_id(audio_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    audio = get_audio_details(db, audio_id)
+    if not audio:
+        return ResponseHandler.error("Audio not found", status_code=404)
+    
+    if(audio.user_id != current_user.id):
+        return ResponseHandler.error("You don't have permission to delete this audio", status_code=403)
+    
+    audio = delete_audio(db, audio_id)
+
+    if not audio:
+        return ResponseHandler.error("Failed to delete audio", status_code=500)
+    
+    return ResponseHandler.success(AudioResponse.model_validate(audio), message="Audio deleted successfully")
+    
+
+
+
 
 
 
