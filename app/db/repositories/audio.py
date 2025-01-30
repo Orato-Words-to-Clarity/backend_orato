@@ -4,7 +4,7 @@ from app.db.models.user import User
 from app.db.models.transcription import Transcription
 
 def get_all_audios(db: Session,user: User): 
-    return db.query(Audio).filter(Audio.user_id == user.id).all()
+    return db.query(Audio).filter(Audio.user_id == user.id).order_by(Audio.created_at.asc()).all()
 
 def get_audio_details(db: Session, audio_id: str):
     return db.query(Audio).options(joinedload(Audio.transcription)).filter(Audio.audio_id == audio_id).first()
