@@ -9,8 +9,8 @@ def get_all_audios(db: Session,user: User):
 def get_audio_details(db: Session, audio_id: str):
     return db.query(Audio).options(joinedload(Audio.transcription)).filter(Audio.audio_id == audio_id).first()
 
-def create_audio(db: Session, current_user:User, blob_url:str, file_name:str):
-    audio = Audio(user_id=current_user.id, file_path=blob_url, file_name=file_name)
+def create_audio(db: Session, current_user:User, blob_url:str, file_name:str, duration:str):
+    audio = Audio(user_id=current_user.id, file_path=blob_url, file_name=file_name, duration=duration)
     db.add(audio)
     db.commit()
     db.refresh(audio)

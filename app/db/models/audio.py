@@ -12,6 +12,7 @@ class Audio(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     file_path = Column(String, nullable=False)
     file_name = Column(String, nullable=False)
+    duration = Column(String, nullable=False)
     language = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=5, minutes=30))))
 
