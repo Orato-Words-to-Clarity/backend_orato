@@ -30,4 +30,4 @@ def delete_audio(db: Session,audio_id:str):
     # delete audio
     db.delete(audio)
     db.commit()
-    return audio
+    return audio+transcription
