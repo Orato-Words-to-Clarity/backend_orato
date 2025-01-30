@@ -8,7 +8,7 @@ from app.utils.auth import get_current_user
 from app.db.models.user import User
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-
+from app.services.embedding_service import transcript_processor
 
 
 router = APIRouter()
@@ -34,6 +34,12 @@ async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_d
         )
         
     transcription_result["transcription_id"] = update_transcription(db,audio.audio_id, transcription_result["text"], transcription_result["language"])
+
+    transcript_processor.accept_transcript(transcription_result.text)
+    transcript_processor.split_into_sentences()
+    transcript_processor.generate_embeddings()
+    transcript_processor.upsert_embeddings_to_pinecone(transcription_result["transcription_id"])
+    
 
     return ResponseHandler.success(
         data={"transcription": transcription_result},

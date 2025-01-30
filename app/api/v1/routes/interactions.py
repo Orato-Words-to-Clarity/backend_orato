@@ -1,19 +1,20 @@
 from fastapi import APIRouter,Depends
-from app.api.v1.schemas.interactions import CreateRequest
+from app.api.v1.schemas.interactions import AskRequest, CreateRequest
 from app.api.v1.schemas.transcription import Transcription, TranscriptionRequest
 from app.db.models.audio import Audio
 from app.db.repositories.transcription import get_transcription_using_id
-from app.services.interaction_service import get_create_generated_content
+from app.services.interaction_service import get_create_generated_content, get_answer_to_query
 from app.utils.response_utils import ResponseHandler, ResponseModel
 from app.utils.auth import get_current_user
 from app.db.models.user import User
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.api.v1.schemas.interactions import RequestType
+from app.services.embedding_service import transcript_processor
 
 router = APIRouter()
 
-@router.post("/create/",response_model=ResponseModel)
+@router.post("/create/",response_model=ResponseModel[str])
 def create_interaction(request: CreateRequest, db: Session= Depends(get_db), user: User= Depends(get_current_user)):
     
     prompt_mapping = {
@@ -80,8 +81,36 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
 
 
 
-# @router.post("/ask",response_model=ResponseModel)
+@router.post("/ask",response_model=ResponseModel[str])
+def ask_question(request: AskRequest, db: Session= Depends(get_db), user: User= Depends(get_current_user)):
+    
+    results = transcript_processor.query_similar_sentences(request.query, request.transcription_id, top_k=3)
+  
+    prompt = f"""
+            You are an expert assistant answering queries based on provided relevant information.
 
-# def ask_question(request: TranscriptionRequest, db: Session= Depends(get_db), user: User= Depends(get_current_user)):
+            [CONTEXT]:  
+            Below are sentences retrieved from a knowledge base along with their relevance scores. 
+            Higher scores indicate stronger relevance to the question.
+
+            {results}
+
+            [QUESTION]:  
+            {request.query}
+
+            [RULES]:  
+            1. Use the most relevant sentences (higher scores) first to form your answer.
+            2. Summarize the key information clearly and concisely.
+            3. Avoid making up details not present in the context.
+            4. If the context lacks enough information to answer the question, respond with:  
+              "I don't have enough information to answer this."
+
+            Provide your answer below:
+        """
+    # Send the prompt to Llama and get the generated content
+    generated_content = get_answer_to_query(prompt)
+    
+    return ResponseHandler.success(message="Content Generated Successfully", data=generated_content)
+  
   
   
