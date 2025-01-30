@@ -16,7 +16,7 @@ def get_create_generated_content(prompt: str):
 
 
     response = client.chat.completions.create(
-        model="llama3-8b-8192",  # Use "llama3-8b" if you need LLaMA 3
+        model="llama3-70b-8192",  # Use "llama3-8b" if you need LLaMA 3
         messages=[
             {"role": "system", "content": "You are a Professional Html Designer and Content Creator/Writer."},
             {"role": "user", "content": prompt}
