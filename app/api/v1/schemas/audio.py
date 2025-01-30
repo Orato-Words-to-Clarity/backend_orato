@@ -8,18 +8,11 @@ from typing import List, Optional
 class TranscriptionResponse(BaseModel):
     transcription_id: str
     text:str
-    language: str
-    created_at: str 
 
     class Config:
         from_attributes = True
         
         
-    @field_validator("created_at", mode="before")
-    def convert_datetime_to_str(cls, value):
-        if isinstance(value, datetime):
-            return value.strftime("%Y-%m-%d %H:%M:%S")
-        return value
     
     @field_validator("transcription_id", mode="before")
     def convert_uuid_to_str(cls, value):

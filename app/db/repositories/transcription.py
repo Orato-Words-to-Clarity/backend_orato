@@ -16,14 +16,16 @@ def update_transcription(db: Session, audio_id:Column[UUID] , transcription:str,
     transcription_obj = db.query(Transcription).filter(Transcription.audio_id == audio_id).first()
     if  transcription_obj:
         transcription_obj.text = transcription
-        transcription_obj.language = language
+        audio_obj = db.query(Audio).filter(Audio.audio_id == audio_id).first()
+        audio_obj.language = language
         db.commit()
     else:
-        transcription_obj = Transcription(audio_id=audio_id,text=transcription,language=language)
+        transcription_obj = Transcription(audio_id=audio_id,text=transcription)
+        audio_obj = db.query(Audio).filter(Audio.audio_id == audio_id).first()
+        audio_obj.language = language
         db.add(transcription_obj)
         db.commit()
-    #display the transcription object details
-    # print("transcriptions object :" ,transcription_obj.language)
+        
     return str(transcription_obj.transcription_id)
     
    
