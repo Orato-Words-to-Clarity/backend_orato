@@ -9,6 +9,7 @@ from app.api.v1.schemas.audio import AudioResponse, AudioWithTranscriptionRespon
 
 from typing import List
 
+from app.utils.audio import get_audio_duration
 from app.utils.auth import get_current_user
 from app.utils.response_utils import ResponseHandler, ResponseModel
 from azure.storage.blob import BlobServiceClient, ContentSettings
@@ -94,6 +95,7 @@ async def upload_audio(file: UploadFile = File(...), db: Session = Depends(get_d
         # Upload the file to Azure Blob Storage
         blob_client = container_client.get_blob_client(blob_name)
 
+
         # Read file content and upload
         blob_client.upload_blob(
             await file.read(),
@@ -104,8 +106,11 @@ async def upload_audio(file: UploadFile = File(...), db: Session = Depends(get_d
         # Construct the blob URL
         blob_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{AZURE_STORAGE_CONTAINER_NAME}/{blob_name}"
 
+        # **Extract Duration from Azure Blob URL**
+        duration = await get_audio_duration(blob_url)
+
         # Save the audio record in the database
-        audio = create_audio(db, current_user, blob_url, file.filename)
+        audio = create_audio(db, current_user, blob_url, file.filename,duration)
         
 
         return ResponseHandler.success(
@@ -114,6 +119,7 @@ async def upload_audio(file: UploadFile = File(...), db: Session = Depends(get_d
                 "audio_id": str(audio.audio_id), 
                 "file_path": audio.file_path, 
                 "file_name": audio.file_name ,
+                "duration": audio.duration,
                 }
             )
 

@@ -1,0 +1,1 @@
+ALTER TABLE audio ADD COLUMN duration TEXT;
