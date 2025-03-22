@@ -79,8 +79,8 @@ def transcribe_audio(file_path: str) -> TranscriptionServiceResponse:
 
         print(transcription)
 
-        # Extract the transcribed text
-        transcribed_text = transcription.text
+        transcribed_text = transcription["text"] if isinstance(transcription, dict) else getattr(transcription, "text", None)
+
         
         # Detect the language of the transcribed text
         try:
