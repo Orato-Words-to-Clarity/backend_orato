@@ -27,6 +27,7 @@ class AudioResponse(BaseModel):
     audio_id: str
     file_path: str
     file_name: str
+    duration: str
     language: str | None
     created_at: str
 
