@@ -77,7 +77,7 @@ def transcribe_audio(file_path: str) -> TranscriptionServiceResponse:
             )
         
 
-
+        print(transcription)
 
         # Extract the transcribed text
         transcribed_text = transcription.text
