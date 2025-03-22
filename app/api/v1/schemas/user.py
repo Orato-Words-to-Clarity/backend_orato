@@ -11,3 +11,11 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
         arbitrary_types_allowed = True
+
+class UserApiKeyResponse(BaseModel):
+    email: str
+    api_keys: dict
+
+    class Config:
+        from_attributes = True
+        arbitrary_types_allowed = True

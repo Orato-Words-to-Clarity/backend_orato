@@ -15,3 +15,8 @@ class APIKeyResponse(APIKeyBase):
 
     class Config:
         from_attributes = True  # This allows conversion from SQLAlchemy models
+
+class APIKeyCheckResponse(BaseModel):
+    is_api_key_set: bool
+    class Config:
+        from_attributes = True  # This allows conversion from SQLAlchemy models

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.db.models.api_keys import APIKey
-from app.api.v1.schemas.api_keys import APIKeyBase, APIKeyCreate,APIKeyResponse
+from app.api.v1.schemas.api_keys import APIKeyBase, APIKeyCheckResponse, APIKeyCreate,APIKeyResponse
 from app.utils.auth import get_current_user
 from app.utils.response_utils import ResponseHandler, ResponseModel
 from cryptography.fernet import Fernet
@@ -31,5 +31,10 @@ def set_api_key(request: APIKeyCreate, db: Session = Depends(get_db), user: User
     return ResponseHandler.success(data=APIKeyResponse.model_validate(api_keys), message="API Key set successfully")
 
 
+@router.get("/is-api-set/", response_model=ResponseModel[APIKeyCheckResponse])
+def is_api_key_set(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    api_keys = db.query(APIKey).filter(APIKey.user_id == user.id).first()
+    if not api_keys or not (api_keys.groq_api_key_encrypted and api_keys.huggingface_api_key_encrypted):
+        return ResponseHandler.success(data={is_api_key_set:False}, message="API Key not set")
     
-    
+    return ResponseHandler.success(data={is_api_key_set:True}, message="API Key already set")
