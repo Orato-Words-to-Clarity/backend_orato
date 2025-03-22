@@ -26,3 +26,15 @@ def get_create_generated_content(prompt: str):
     
     return response.choices[0].message.content
     
+def get_answer_to_query(prompt: str):
+    
+    response = client.chat.completions.create(
+        model="llama3-70b-8192",  # Use "llama3-8b" if you need LLaMA 3
+        messages=[
+            {"role": "system", "content": "You are a Helpful AI Assistant"},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3,
+    )
+    
+    return response.choices[0].message.content

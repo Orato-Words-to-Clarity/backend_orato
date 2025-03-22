@@ -12,4 +12,9 @@ class RequestType(str, enum.Enum):
 class CreateRequest(BaseModel):
     request_type: Literal["meeting_minutes", "class_notes", "summary", "custom"]
     custom_prompt: str = ""
-    transcription_id: str 
+    transcription_id: str
+    
+    
+class AskRequest(BaseModel):
+    query: str
+    transcription_id: str
