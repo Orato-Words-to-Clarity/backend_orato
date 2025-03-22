@@ -1,7 +1,5 @@
 from fastapi import APIRouter,Depends
 from app.api.v1.schemas.interactions import CreateRequest
-from app.api.v1.schemas.transcription import Transcription, TranscriptionRequest
-from app.db.models.audio import Audio
 from app.db.repositories.transcription import get_transcription_using_id
 from app.services.interaction_service import get_create_generated_content
 from app.utils.response_utils import ResponseHandler, ResponseModel

@@ -1,6 +1,9 @@
+import uuid
+from sqlalchemy.orm import joinedload
 from fastapi import APIRouter,Depends
-from app.api.v1.schemas.transcription import Transcription, TranscriptionRequest
+from app.api.v1.schemas.transcription import TranscriptionModel, TranscriptionEditRequest, TranscriptionRequest
 from app.db.models.audio import Audio
+from app.db.models.transcription import Transcription
 from app.db.repositories.transcription import update_transcription
 from app.services.transcription_service import transcribe_audio
 from app.utils.response_utils import ResponseHandler, ResponseModel
@@ -16,7 +19,7 @@ router = APIRouter()
 
 
 
-@router.post("/transcribe/", response_model=ResponseModel[Transcription])
+@router.post("/transcribe/", response_model=ResponseModel[TranscriptionModel])
 async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     # Get the audio file url from the db using audio id
     audio: Audio | None = db.query(Audio).filter(Audio.audio_id == request.audio_id).first()
@@ -38,4 +41,27 @@ async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_d
     return ResponseHandler.success(
         data={"transcription": transcription_result},
         message="Transcription successful"
+    )
+
+
+@router.patch('/edit/', response_model=ResponseModel[TranscriptionModel])
+async def edit_transcription(request: TranscriptionEditRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    # Get the transcription from the db using transcription id
+    print(request.transcription_id)
+
+    transcription = db.query(Transcription).options(joinedload(Transcription.audio)).filter(Transcription.transcription_id == request.transcription_id).first()
+
+
+    if not transcription:
+        ResponseHandler.error(message="Transcription not found", status_code=400)
+    
+    if(transcription.audio.user_id != user.id):
+        ResponseHandler.error(message="You don't have permission to access this transcription", status_code=403)
+
+    transcription.text = request.text
+    db.commit()
+
+    return ResponseHandler.success(
+        data={"transcription": request.text},
+        message="Transcription edited successfully"
     )
