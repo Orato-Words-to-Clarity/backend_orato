@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from cryptography.fernet import Fernet
 import os
 
-from app.utils.response_utils import ResponseHandler
+from app.utils.response_utils import ResponseHandler, ResponseModel
 router = APIRouter()
 cipher = Fernet(os.getenv("ENCRYPTION_KEY"))
 
@@ -16,7 +16,7 @@ cipher = Fernet(os.getenv("ENCRYPTION_KEY"))
 # async def read_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
 #     return [{"username": "user1"}, {"username": "user2"}]
 
-@router.get("/")
+@router.get("/",response_model=ResponseModel[UserApiKeyResponse])
 async def read_root(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     api_keys = db.query(APIKey).filter(APIKey.user_id == current_user.id).first()
     if not api_keys:
