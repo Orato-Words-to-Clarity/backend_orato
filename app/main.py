@@ -20,7 +20,6 @@ app.add_middleware(
 # AUTH MIDDLEWARE HAS BEEN CHANGE TO THE Depends(get_user) method as discussed before. Function Below is redundant.
 # create_auth_middleware(app)
 
-app.include_router(users.router, prefix="/api/v1")
 app.include_router(api_router, prefix="/api/v1")
 
 @app.get('/')

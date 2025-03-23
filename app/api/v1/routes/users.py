@@ -12,9 +12,9 @@ from app.utils.response_utils import ResponseHandler
 router = APIRouter()
 cipher = Fernet(os.getenv("ENCRYPTION_KEY"))
 
-@router.get("/users/", tags=["users"])
-async def read_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return [{"username": "user1"}, {"username": "user2"}]
+# @router.get("/users/", tags=["users"])
+# async def read_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+#     return [{"username": "user1"}, {"username": "user2"}]
 
 @router.get("/")
 async def read_root(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
