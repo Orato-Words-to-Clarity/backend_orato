@@ -1,15 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class APIKeyBase(BaseModel):
-    groq_api_key_encrypted: Optional[str] = None
-    huggingface_api_key_encrypted: Optional[str] = None
-
-class APIKeyCreate(APIKeyBase):
+class APIKeyCreate(BaseModel):
     groq_api_key: Optional[str] = None
     huggingface_api_key: Optional[str] = None
 
-class APIKeyResponse(APIKeyBase):
+class APIKeyResponse(BaseModel):
     id: int
     user_id: int
 

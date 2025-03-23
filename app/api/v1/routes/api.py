@@ -17,7 +17,7 @@ cipher = Fernet(os.getenv("ENCRYPTION_KEY"))
 
 
 
-@router.post("/set-api-key/", response_model=ResponseModel[APIKeyResponse])
+@router.post("/set-api-key/", response_model=ResponseModel)
 def set_api_key(request: APIKeyCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     # set the user with the api key even it already exits or if it is null
     if not request:
@@ -28,7 +28,7 @@ def set_api_key(request: APIKeyCreate, db: Session = Depends(get_db), user: User
     db.add(api_keys)
     db.commit()
     db.refresh(api_keys)
-    return ResponseHandler.success(data=APIKeyResponse.model_validate(api_keys), message="API Key set successfully")
+    return ResponseHandler.success(message="API Key set successfully")
 
 
 @router.get("/is-api-set/", response_model=ResponseModel[APIKeyCheckResponse])
