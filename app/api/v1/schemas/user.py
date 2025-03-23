@@ -14,7 +14,8 @@ class UserResponse(BaseModel):
 
 class UserApiKeyResponse(BaseModel):
     email: str
-    api_keys: dict
+    groq_api_key: str | None
+    huggingface_api_key: str | None
 
     class Config:
         from_attributes = True
