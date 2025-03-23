@@ -35,6 +35,6 @@ def set_api_key(request: APIKeyCreate, db: Session = Depends(get_db), user: User
 def is_api_key_set(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     api_keys = db.query(APIKey).filter(APIKey.user_id == user.id).first()
     if not api_keys or not (api_keys.groq_api_key_encrypted and api_keys.huggingface_api_key_encrypted):
-        return ResponseHandler.success(data={is_api_key_set:False}, message="API Key not set")
+        return ResponseHandler.success(data={"is_api_key_set":False}, message="API Key not set")
     
-    return ResponseHandler.success(data={is_api_key_set:True}, message="API Key already set")
+    return ResponseHandler.success(data={"is_api_key_set":True}, message="API Key already set")
