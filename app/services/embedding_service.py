@@ -3,18 +3,22 @@ import requests
 import os
 from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
+from app.utils.enums import Provider
+from app.utils.api import get_api_key
+from app.db.models.user import User
+from sqlalchemy.orm import Session
 
 load_dotenv()
 # TranscriptProcessor 
 class TranscriptProcessor:
-    def __init__(self):
+    def __init__(self,db: Session,user: User):
         # Initialize variables
         self.transcript = ""
         self.sentences = []
         self.embeddings = []
         
         # Huggingface API Configuration
-        self.hf_api_key = os.getenv('HUGGING_FACE_API_KEY')
+        self.hf_api_key = get_api_key(Provider.HUGGINGFACE,db,user)
         self.api_url = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
         self.headers = {"Authorization": f"Bearer {self.hf_api_key}"}
         
@@ -35,7 +39,7 @@ class TranscriptProcessor:
                 metric="cosine",
                 spec=ServerlessSpec(
                     cloud='aws',
-                    region='us-west-2'
+                    region='us-east-1'
                 )
             )
         self.index = self.pc.Index(self.index_name)
@@ -139,4 +143,3 @@ class TranscriptProcessor:
         return relevant_sentences
                 
 
-transcript_processor = TranscriptProcessor()

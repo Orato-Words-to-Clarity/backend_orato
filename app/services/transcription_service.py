@@ -4,13 +4,14 @@ import requests
 from groq import Groq
 from dotenv import load_dotenv
 from langdetect import detect, LangDetectException
+from app.utils.enums import Provider
+from app.utils.api import get_api_key
+from app.db.models.user import User
+from sqlalchemy.orm import Session
 
 
 load_dotenv()
 
-# Initialize the Groq client
-api_key =  os.getenv("GROQ_API_KEY")
-client = Groq(api_key=api_key)
 
 # Mapping from language codes to language names
 LANGUAGE_CODES_TO_NAMES = {
@@ -56,7 +57,7 @@ class TranscriptionServiceResponse:
     language: str
     transcription_id: str = None
 
-def transcribe_audio(file_path: str) -> TranscriptionServiceResponse:
+def transcribe_audio(file_path: str,db : Session,user : User) -> TranscriptionServiceResponse:
     """
     Transcribe audio using the Groq Whisper API.
     :param file_path: Path to the audio file which is a url to the file stored in Azure Blob Storage.
@@ -64,6 +65,11 @@ def transcribe_audio(file_path: str) -> TranscriptionServiceResponse:
     """
     try:
         # Get the audio file from Azure Blob Storage
+
+        # Initialize the Groq client
+        api_key =  get_api_key(Provider.GROQ,db,user)
+        print(api_key)
+        client = Groq(api_key=api_key)
         
         response = requests.get(file_path)
         response.raise_for_status()

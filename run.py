@@ -18,7 +18,7 @@ if __name__ == "__main__":
     import uvicorn
 
     # Step 1: Run migrations
-    run_migrations()
+    #run_migrations()
 
     # Step 2: Start the FastAPI app
     port = int(os.getenv("PORT", 8000))  # Default to 8000 if PORT is not set

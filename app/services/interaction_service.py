@@ -3,16 +3,22 @@ import os
 import requests
 from groq import Groq
 from dotenv import load_dotenv
+from app.utils.enums import Provider
+from app.utils.api import get_api_key
+from app.db.models.user import User
+from sqlalchemy.orm import Session
 
 
 load_dotenv()
 
-# Initialize the Groq client
-api_key =  os.getenv("GROQ_API_KEY")
-client = Groq(api_key=api_key)
 
 
-def get_create_generated_content(prompt: str):
+
+def get_create_generated_content(prompt: str,db : Session,user : User) -> str:
+
+    # Initialize the Groq client
+    api_key =  get_api_key(Provider.GROQ,db,user)
+    client = Groq(api_key=api_key)
 
 
     response = client.chat.completions.create(
@@ -26,7 +32,11 @@ def get_create_generated_content(prompt: str):
     
     return response.choices[0].message.content
     
-def get_answer_to_query(prompt: str):
+def get_answer_to_query(prompt: str,db : Session,user : User) -> str:
+
+    # Initialize the Groq client
+    api_key =  get_api_key(Provider.GROQ,db,user)
+    client = Groq(api_key=api_key)
     
     response = client.chat.completions.create(
         model="llama3-70b-8192",  # Use "llama3-8b" if you need LLaMA 3

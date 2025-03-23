@@ -8,7 +8,7 @@ from app.db.models.user import User
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.api.v1.schemas.interactions import RequestType
-from app.services.embedding_service import transcript_processor
+from app.services.embedding_service import TranscriptProcessor
 
 router = APIRouter()
 
@@ -71,7 +71,7 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
             
             
     # Send the prompt to Llama and get the generated content
-    generated_content = get_create_generated_content(structured_prompt)
+    generated_content = get_create_generated_content(structured_prompt,db,user)
     
     return ResponseHandler.success(message="Content Generated Successfully", data=generated_content)
     
@@ -81,7 +81,7 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
 
 @router.post("/ask",response_model=ResponseModel[str])
 def ask_question(request: AskRequest, db: Session= Depends(get_db), user: User= Depends(get_current_user)):
-    
+    transcript_processor=TranscriptProcessor(db,user)
     results = transcript_processor.query_similar_sentences(request.query, request.transcription_id, top_k=3)
   
     prompt = f"""
@@ -106,7 +106,7 @@ def ask_question(request: AskRequest, db: Session= Depends(get_db), user: User= 
             Provide your answer below:
         """
     # Send the prompt to Llama and get the generated content
-    generated_content = get_answer_to_query(prompt)
+    generated_content = get_answer_to_query(prompt,db,user)
     
     return ResponseHandler.success(message="Content Generated Successfully", data=generated_content)
   
