@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.db.models.api_keys import APIKey
-from app.api.v1.schemas.api_keys import APIKeyBase, APIKeyCheckResponse, APIKeyCreate,APIKeyResponse
+from app.api.v1.schemas.api_keys import APIKeyCheckResponse, APIKeyCreate,APIKeyResponse
 from app.utils.auth import get_current_user
 from app.utils.response_utils import ResponseHandler, ResponseModel
 from cryptography.fernet import Fernet
