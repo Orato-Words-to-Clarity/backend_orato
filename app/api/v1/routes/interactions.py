@@ -95,12 +95,12 @@ def ask_question(request: AskRequest, db: Session= Depends(get_db), user: User= 
 
             [QUESTION]:  
             {request.query}
-
-            [RULES]:  
+            [RULES]: 
             1. Use the most relevant sentences (higher scores) first to form your answer.
-            2. Summarize the key information clearly and concisely.
-            3. Avoid making up details not present in the context.
-            4. If the context lacks enough information to answer the question, respond with:  
+            2. Do not provide unnecessary information or context that is not relevant to the question.
+            3. Summarize the key information clearly and concisely.
+            4. Avoid making up details not present in the context.
+            5. If the context lacks enough information to answer the question, respond with:  
               "I don't have enough information to answer this."
 
             Provide your answer below:
