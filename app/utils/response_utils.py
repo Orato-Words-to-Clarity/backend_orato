@@ -10,12 +10,12 @@ class ResponseModel(BaseModel, Generic[T]):
     data: Optional[T]
     status_code: int
 
-class PaginatedResponseModel(BaseModel, Generic[T]):
-    status: str
-    message: str
-    data: Optional[List[T]]
-    pagination: Optional[dict]
-    status_code: int
+# class PaginatedResponseModel(BaseModel, Generic[T]):
+#     status: str
+#     message: str
+#     data: Optional[List[T]]
+#     pagination: Optional[dict]
+#     status_code: int
 
 class ResponseHandler:
     @staticmethod
@@ -48,23 +48,23 @@ class ResponseHandler:
         )
         return JSONResponse(status_code=status_code, content=response.model_dump())
 
-    @staticmethod
-    def paginated(data: List[T], total_count: int, page: int, page_size: int, message="Data fetched successfully", status_code=200):
-        """
-        Generates a paginated response.
-        """
-        response = PaginatedResponseModel[
-            type(data[0]) if data else None
-        ](
-            status="success",
-            message=message,
-            data=data,
-            pagination={
-                "total_count": total_count,
-                "current_page": page,
-                "page_size": page_size,
-                "total_pages": (total_count + page_size - 1) // page_size,
-            },
-            status_code=status_code
-        )
-        return JSONResponse(status_code=status_code, content=response.model_dump())
+    # @staticmethod
+    # def paginated(data: List[T], total_count: int, page: int, page_size: int, message="Data fetched successfully", status_code=200):
+    #     """
+    #     Generates a paginated response.
+    #     """
+    #     response = PaginatedResponseModel[
+    #         type(data[0]) if data else None
+    #     ](
+    #         status="success",
+    #         message=message,
+    #         data=data,
+    #         pagination={
+    #             "total_count": total_count,
+    #             "current_page": page,
+    #             "page_size": page_size,
+    #             "total_pages": (total_count + page_size - 1) // page_size,
+    #         },
+    #         status_code=status_code
+    #     )
+    #     return JSONResponse(status_code=status_code, content=response.model_dump())
