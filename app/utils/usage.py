@@ -25,8 +25,12 @@ def update_usage(user_id: str, model: str, tokens_used: int, db: Session):
 
     # Update the correct model's token count
     if model == "llama":
+        if usage.total_llama_tokens is None:
+            usage.total_llama_tokens = 0
         usage.total_llama_tokens += tokens_used
     elif model == "whisper":
+        if usage.total_whisper_tokens is None:
+            usage.total_whisper_tokens = 0
         usage.total_whisper_tokens += tokens_used
 
     db.commit()
