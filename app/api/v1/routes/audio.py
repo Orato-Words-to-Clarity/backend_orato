@@ -40,7 +40,7 @@ def get_audio_with_transcription(audio_id: str, db: Session = Depends(get_db), c
     print(audio.transcription)
     return ResponseHandler.success(AudioWithTranscriptionResponse.model_validate(audio), message="Audio retrieved successfully")
 
-@router.delete("/{audio_id}/delete", response_model=ResponseModel[AudioResponse])
+@router.delete("/{audio_id}/delete/", response_model=ResponseModel[AudioResponse])
 def delete_audio_with_id(audio_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     audio = get_audio_details(db, audio_id)
     if not audio:
@@ -50,9 +50,10 @@ def delete_audio_with_id(audio_id: str, db: Session = Depends(get_db), current_u
         return ResponseHandler.error("You don't have permission to delete this audio", status_code=403)
     
     audio = delete_audio(db, audio_id)
+    
 
     if not audio:
-        return ResponseHandler.error("Failed to delete audio", status_code=500)
+        return ResponseHandler.error("Failed to delete audio", status_code=400)
     
     return ResponseHandler.success(AudioResponse.model_validate(audio), message="Audio deleted successfully")
     
