@@ -14,4 +14,8 @@ class UsageLimit(Base):
     total_llama_tokens = Column(Integer, nullable=False, default=0)
     total_whisper_tokens = Column(Integer, nullable=False, default=0)
 
-    user = relationship("User", back_populates="usage_limits")  # Optional: to allow easy access to related user data
+    # Use string 'User' to delay the lookup of the User class
+    user = relationship("User", back_populates="usage_limits")
+
+    def __repr__(self):
+        return f"<UsageLimit(user_id={self.user_id}, date={self.date}, llama={self.total_llama_tokens}, whisper={self.total_whisper_tokens})>"
