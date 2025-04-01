@@ -9,11 +9,19 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.api.v1.schemas.interactions import RequestType
 from app.services.embedding_service import TranscriptProcessor
+from app.utils.usage import check_usage_limit, estimate_tokens, update_usage
 
 router = APIRouter()
 
 @router.post("/create/",response_model=ResponseModel[str])
 def create_interaction(request: CreateRequest, db: Session= Depends(get_db), user: User= Depends(get_current_user)):
+    
+    if check_usage_limit(user.id, "whisper", db):
+        return ResponseHandler.error(
+            message="Usage limit exceeded",
+            status_code=429,
+            details={"usage_limit": "You have exceeded your usage limit for today."}
+        )
     
     prompt_mapping = {
         RequestType.MEETING_MINUTES: "Generate Detailed Meeting Minutes from the following transcription given below.",
@@ -72,6 +80,9 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
             
     # Send the prompt to Llama and get the generated content
     generated_content = get_create_generated_content(structured_prompt,db,user)
+    input_tokens = estimate_tokens(structured_prompt)
+    output_tokens = estimate_tokens(generated_content) 
+    update_usage(user.id, "llama", input_tokens+output_tokens, db)
     
     return ResponseHandler.success(message="Content Generated Successfully", data=generated_content)
     
@@ -81,6 +92,13 @@ def create_interaction(request: CreateRequest, db: Session= Depends(get_db), use
 
 @router.post("/ask",response_model=ResponseModel[str])
 def ask_question(request: AskRequest, db: Session= Depends(get_db), user: User= Depends(get_current_user)):
+    if check_usage_limit(user.id, "whisper", db):
+        return ResponseHandler.error(
+            message="Usage limit exceeded",
+            status_code=429,
+            details={"usage_limit": "You have exceeded your usage limit for today."}
+        )
+  
     transcript_processor=TranscriptProcessor(db,user)
     results = transcript_processor.query_similar_sentences(request.query, request.transcription_id, top_k=3)
   
@@ -107,6 +125,9 @@ def ask_question(request: AskRequest, db: Session= Depends(get_db), user: User= 
         """
     # Send the prompt to Llama and get the generated content
     generated_content = get_answer_to_query(prompt,db,user)
+    input_tokens = estimate_tokens(prompt)
+    output_tokens = estimate_tokens(generated_content)
+    update_usage(user.id, "llama", input_tokens+output_tokens, db)
     
     return ResponseHandler.success(message="Content Generated Successfully", data=generated_content)
   

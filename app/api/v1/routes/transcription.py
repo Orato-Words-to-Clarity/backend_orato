@@ -12,6 +12,7 @@ from app.db.models.user import User
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.services.embedding_service import TranscriptProcessor
+from app.utils.usage import check_usage_limit, estimate_tokens, update_usage
 
 
 router = APIRouter()
@@ -21,6 +22,14 @@ router = APIRouter()
 
 @router.post("/transcribe/", response_model=ResponseModel[TranscriptionModel])
 async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+     
+    if check_usage_limit(user.id, "whisper", db):
+        return ResponseHandler.error(
+            message="Usage limit exceeded",
+            status_code=429,
+            details={"usage_limit": "You have exceeded your usage limit for transcription today."}
+        )
+    
     # Get the audio file url from the db using audio id
     audio: Audio | None = db.query(Audio).filter(Audio.audio_id == request.audio_id).first()
     if not audio:
@@ -35,6 +44,9 @@ async def transcribe(request: TranscriptionRequest,  db: Session = Depends(get_d
             details=transcription_result,
             status_code=500
         )
+        
+    output_tokens = estimate_tokens(transcription_result["text"])
+    update_usage(user.id, "whisper", output_tokens , db)
         
     transcription_result["transcription_id"] = update_transcription(db,audio.audio_id, transcription_result["text"], transcription_result["language"])
 
