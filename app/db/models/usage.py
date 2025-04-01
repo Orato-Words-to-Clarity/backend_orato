@@ -2,8 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import date
-
-Base = declarative_base()
+from app.core.database import Base
 
 class UsageLimit(Base):
     __tablename__ = "usage_limits"

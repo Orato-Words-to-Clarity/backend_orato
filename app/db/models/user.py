@@ -9,4 +9,3 @@ class User(Base):
     hashed_password = Column(String)
 
     api_keys = relationship("APIKey", back_populates="user", uselist=False, cascade="all, delete-orphan")  # Fix reference
-    usage_limits = relationship("UsageLimit", back_populates="user")
