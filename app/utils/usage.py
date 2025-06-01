@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from app.db.models.usage import UsageLimit  # Import your ORM model
 
 DAILY_LIMITS = {
-    "llama": 500_000,
-    "whisper": 200_000
+    "llama": 500,
+    "whisper": 200
 }
 
 
